@@ -1,40 +1,39 @@
+use crate::resp::IntOrDecimal;
 use anyhow::{anyhow, Result};
 use serde::{de, Deserialize, Deserializer, Serialize};
 use serde_derive::{Deserialize, Serialize};
 use std::{fmt::Debug, hash::Hash};
-use websocket::client::sync::Client;
-use websocket::sync::stream::NetworkStream;
 
 /// Information about the ticker for a particular
 /// pair at a given point in time.
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize)]
 pub struct TickerState {
     #[serde(rename = "channelId")]
-    channel_id: u32,
-    pair: String,
-    ask: BidAskData,
-    bid: BidAskData,
-    close: ValueMarker<String>,
-    volume: ValueMarker<String>,
+    pub channel_id: u32,
+    pub pair: String,
+    pub ask: BidAskData,
+    pub bid: BidAskData,
+    pub close: ValueMarker<String>,
+    pub volume: ValueMarker<String>,
     #[serde(rename = "volumeWeightedAvgPrice")]
-    volume_weighted_avg_price: ValueMarker<String>,
+    pub volume_weighted_avg_price: ValueMarker<String>,
     #[serde(rename = "tradeCount")]
-    trade_count: ValueMarker<u32>,
+    pub trade_count: ValueMarker<u32>,
     #[serde(rename = "lowPrice")]
-    low_price: ValueMarker<String>,
+    pub low_price: ValueMarker<String>,
     #[serde(rename = "highPrice")]
-    high_price: ValueMarker<String>,
+    pub high_price: ValueMarker<String>,
     #[serde(rename = "openPrice")]
-    open_price: ValueMarker<String>,
+    pub open_price: ValueMarker<String>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize)]
 pub struct BidAskData {
-    price: String,
+    pub price: String,
     #[serde(rename = "wholeLotVolume")]
-    whole_lot_volume: u64,
+    pub whole_lot_volume: u64,
     #[serde(rename = "lotVolume")]
-    lot_volume: String,
+    pub lot_volume: String,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, Serialize)]
@@ -42,9 +41,9 @@ pub struct ValueMarker<T>
 where
     T: Debug + Clone + Eq + PartialEq + Hash + Serialize,
 {
-    today: T,
+    pub today: T,
     #[serde(rename = "last24h")]
-    last_24h: T,
+    pub last_24h: T,
 }
 
 impl BidAskData {
@@ -131,13 +130,6 @@ enum TickerResponsePart {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
-#[serde(untagged)]
-enum IntOrDecimal {
-    Int(u64),
-    Dec(String),
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize)]
 struct TickerResponseData {
     #[serde(rename = "a")]
     ask: [IntOrDecimal; 3],
@@ -167,44 +159,15 @@ mod test {
     const VALID_TICKER_RESPONSE: &'static str = r#"[
       0,
       {
-        "a": [
-          "5525.40000",
-          1,
-          "1.000"
-        ],
-        "b": [
-          "5525.10000",
-          1,
-          "1.000"
-        ],
-        "c": [
-          "5525.10000",
-          "0.00398963"
-        ],
-        "h": [
-          "5783.00000",
-          "5783.00000"
-        ],
-        "l": [
-          "5505.00000",
-          "5505.00000"
-        ],
-        "o": [
-          "5760.70000",
-          "5763.40000"
-        ],
-        "p": [
-          "5631.44067",
-          "5653.78939"
-        ],
-        "t": [
-          11493,
-          16267
-        ],
-        "v": [
-          "2634.11501494",
-          "3591.17907851"
-        ]
+        "a": ["5525.40000", 1,  "1.000"],
+        "b": ["5525.10000", 1,  "1.000"],
+        "c": ["5525.10000", "0.00398963"],
+        "h": ["5783.00000", "5783.00000"],
+        "l": ["5505.00000", "5505.00000"],
+        "o": ["5760.70000", "5763.40000"],
+        "p": ["5631.44067", "5653.78939"],
+        "t": [11493, 16267],
+        "v": ["2634.11501494", "3591.17907851"]
       },
       "ticker",
       "XBT/USD"

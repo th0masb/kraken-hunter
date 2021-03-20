@@ -1,13 +1,13 @@
 mod req;
-mod ticker;
+mod resp;
 
-use crate::req::{Subscription, WsReq};
-use anyhow::{anyhow, Error, Result};
+use crate::req::{OhlcInterval, Subscription, WsReq};
+use anyhow::{Error, Result};
+use resp::ticker::TickerState;
 use websocket::client::sync::Client;
 use websocket::websocket_base::stream::sync::NetworkStream;
 use websocket::ws::dataframe::DataFrame;
 use websocket::{ClientBuilder, Message, OwnedMessage};
-use crate::ticker::TickerState;
 
 const ENDPOINT: &'static str = "wss://ws.kraken.com";
 
@@ -46,19 +46,30 @@ fn main() -> Result<()> {
     client.send_req(WsReq::Subscribe {
         request_id: Some(12),
         pair: vec!["ETH/USD".to_string()],
+        subscription: Subscription::Ohlc {
+            interval: OhlcInterval::Mins15,
+        },
+    })?;
+    client.send_req(WsReq::Subscribe {
+        request_id: Some(12),
+        pair: vec!["ETH/USD".to_string()],
         subscription: Subscription::Ticker,
     })?;
 
     for message in client
         .inner
         .incoming_messages()
-        .take(10)
+        .take(20)
         .filter_map(|x| x.ok())
         .filter_map(|x| match x {
-            OwnedMessage::Text(s) => serde_json::from_str::<TickerState>(s.as_str()).ok(),
-            _ => None
+            OwnedMessage::Text(s) => serde_json::from_str::<resp::Resp>(s.as_str()).ok(),
+            _ => None,
         })
     {
+        match message {
+            resp::Resp::Ticker(TickerState { channel_id: _, .. }) => {}
+            _ => {}
+        }
         println!("{:?}", message)
     }
 
