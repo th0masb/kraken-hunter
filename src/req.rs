@@ -1,5 +1,5 @@
 use serde::{Serialize, Serializer};
-use serde_derive::{Deserialize, Serialize};
+use serde_derive::Serialize;
 
 /// Kraken Websocket request
 #[derive(Clone, Eq, PartialEq, Serialize)]
