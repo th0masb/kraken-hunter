@@ -1,0 +1,34 @@
+name: kraken-rs thorough checks on pull request
+on:
+  pull_request:
+    paths:
+      - kraken-rs/src/**
+    branches:
+      - main
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  kraken-rs-thorough-build-and-test-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build unoptimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose
+      - name: Run unoptimised tests
+        run: cargo test --manifest-path ./kraken-rs/Cargo.toml --verbose
+      - name: Build optimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose --release
+      - name: Run optimised tests
+        run: cargo test --manifest-path ./kraken-rs/Cargo.toml --verbose --release
+  kraken-rs-builds-aarch64:
+    runs-on: ubuntu-latest
+    container:
+      image: th0masb/rust-x-compile-aarch64-linux-gnu:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Show directory
+        run: pwd && ls -la
+      - name: Build unoptimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose --target aarch64-unknown-linux-gnu
+      - name: Build optimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --release --verbose --target aarch64-unknown-linux-gnu
