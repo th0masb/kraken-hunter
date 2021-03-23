@@ -20,7 +20,7 @@ jobs:
         run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose --release
       - name: Run optimised tests
         run: cargo test --manifest-path ./kraken-rs/Cargo.toml --verbose --release
-  kraken-rs-builds-aarch64:
+  kraken-rs-builds-aarch64-gnu:
     runs-on: ubuntu-latest
     container:
       image: th0masb/rust-x-compile-aarch64-linux-gnu:latest
@@ -32,3 +32,15 @@ jobs:
         run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose --target aarch64-unknown-linux-gnu
       - name: Build optimised
         run: cargo build --manifest-path ./kraken-rs/Cargo.toml --release --verbose --target aarch64-unknown-linux-gnu
+  kraken-rs-builds-aarch64-musl:
+    runs-on: ubuntu-latest
+    container:
+      image: th0masb/rust-x-compile-aarch64-linux-musl:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Show directory
+        run: pwd && ls -la
+      - name: Build unoptimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --verbose --target aarch64-unknown-linux-musl
+      - name: Build optimised
+        run: cargo build --manifest-path ./kraken-rs/Cargo.toml --release --verbose --target aarch64-unknown-linux-musl
