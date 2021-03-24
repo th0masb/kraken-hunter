@@ -59,7 +59,6 @@ fn main() -> Result<()> {
     for message in client
         .inner
         .incoming_messages()
-        .take(20)
         .filter_map(|x| x.ok())
         .filter_map(|x| match x {
             OwnedMessage::Text(s) => serde_json::from_str::<resp::Resp>(s.as_str()).ok(),
