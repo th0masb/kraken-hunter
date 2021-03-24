@@ -2,12 +2,12 @@ name: kraken-rs publish application docker image
 on:
   push:
     branches:
-      - ISSUE-*
+      - ISSUE-17-main
 env:
   CARGO_TERM_COLOR: always
 jobs:
-  publish-image:
-    runs-on: ubuntu-latest
+  publish-kraken-rs-image:
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - name: Docker version
