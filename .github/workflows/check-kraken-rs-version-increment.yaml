@@ -1,0 +1,20 @@
+name: Check kraken-rs version
+on:
+  pull_request:
+    branches:
+      - ISSUE-17-main
+    paths:
+      - kraken-rs/src/**
+      - kraken-rs/Dockerfile
+      - kraken-rs/Cargo.toml
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  check-kraken-rs-version-increment:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Check version
+        run: PROJECT=kraken-rs ./tools/cargo-version-compare.sh
