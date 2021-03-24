@@ -2,7 +2,7 @@ name: Check kraken-rs version
 on:
   pull_request:
     branches:
-      - ISSUE-17-main
+      - main
     paths:
       - kraken-rs/src/**
       - kraken-rs/Dockerfile
