@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - ISSUE-17-main
+    paths:
+      - kraken-rs/src/**
+      - kraken-rs/Dockerfile
+      - kraken-rs/Cargo.toml
 env:
   CARGO_TERM_COLOR: always
 jobs:
@@ -11,12 +15,31 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Docker version
-        run: docker version
+        run: >
+          docker version
       - name: Install QEMU emulator
-        run: sudo apt-get install qemu binfmt-support qemu-user-static
-      - name: Configure GEMU for docker
-        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        run: >
+          sudo apt-get install qemu binfmt-support qemu-user-static
+      - name: Configure QEMU for docker
+        run: >
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - name: Set version
+        run: >
+          IMAGE_VERSION=$(cat kraken-rs/Cargo.toml
+          | grep -E '^version = "[0-9]+\.[0-9]+\.[0-9]+"$'
+          | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
+          && echo "image_version=$IMAGE_VERSION" >> $GITHUB_ENV
+      - name: Print version
+        run: >
+          echo "${{ env.image_version }}"
+      - name: Docker login
+        env:
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        run: >
+          docker login -u th0masb -p "$DOCKER_HUB_PASSWORD"
       - name: Docker build
-        run: docker build -t kraken-rs:latest ./kraken-rs
-      - name: Show image
-        run: docker image ls
+        run: >
+          docker build -t "th0masb/kraken-rs-issue-17:${{ env.image_version }}" ./kraken-rs
+      - name: Docker push
+        run: >
+          docker push "th0masb/kraken-rs-issue-17:${{ env.image_version }}"
